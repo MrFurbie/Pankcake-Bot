@@ -100,11 +100,19 @@ public class Telemetry {
 
         /* Telemeterize the module's states */
         for (int i = 0; i < 4; ++i) {
+
             m_moduleSpeeds[i].setAngle(state.ModuleStates[i].angle);
             m_moduleDirections[i].setAngle(state.ModuleStates[i].angle);
             m_moduleSpeeds[i].setLength(state.ModuleStates[i].speedMetersPerSecond / (2 * MaxSpeed));
 
-            SmartDashboard.putData("Module " + i, m_moduleMechanisms[i]);
+            SmartDashboard.putData("Module " + i + "/ Mechanism", m_moduleMechanisms[i]);
+
+            SmartDashboard.putNumber("Module " + i + "/ Angle Current", state.ModuleStates[i].angle.getRadians());
+            SmartDashboard.putNumber("Module " + i + "/ Speed Current", state.ModuleStates[i].speedMetersPerSecond);
+
+            SmartDashboard.putNumber("Module " + i + "/ Angle Target", state.ModuleTargets[i].angle.getRadians());
+            SmartDashboard.putNumber("Module " + i + "/ Speed Target", state.ModuleTargets[i].speedMetersPerSecond);
+
         }
     }
 }
