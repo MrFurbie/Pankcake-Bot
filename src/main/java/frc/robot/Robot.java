@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,6 +27,7 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().run(); 
 
     SmartDashboard.putNumber(" Drive Voltage", m_robotContainer.getVoltage() * 12);
+    SmartDashboard.putNumber("Drive Velocity", m_robotContainer.getVelocity() * 4 * Math.PI / 254.0);
 
   }
 

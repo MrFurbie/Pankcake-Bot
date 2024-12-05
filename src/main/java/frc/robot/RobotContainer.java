@@ -20,8 +20,16 @@ public class RobotContainer {
   public double getVoltage() {
 
     return  
-    
+
     drivetrain.getModule(0).getDriveMotor().get();
+
+  }
+
+    public double getVelocity() {
+
+    return  
+
+    drivetrain.getModule(0).getDriveMotor().getVelocity().getValueAsDouble();
 
   }
 
@@ -41,7 +49,7 @@ public class RobotContainer {
   private void configureBindings() {
 
     drivetrain.setDefaultCommand(
-      drivetrain.applyRequest(() -> drive.withVelocityX(1) // Drive forward with negative Y (forward)
+      drivetrain.applyRequest(() -> drive.withVelocityX(0) // Drive forward with negative Y (forward)
             .withVelocityY(0) // Drive left with negative X (left)
             .withRotationalRate(0))); // Drive counterclockwise with negative X (left)
 
