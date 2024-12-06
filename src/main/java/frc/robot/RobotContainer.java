@@ -14,7 +14,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Swerve;
 
 public class RobotContainer {
-  private double MaxSpeed = TunerConstants.kSpeedAt12VoltsMps;
+  private double MaxSpeed = TunerConstants.kSpeedAt12VoltsMps * 0.5;
   private double MaxAngularRate = 1.5 * Math.PI; 
 
   public double getVoltage() {
@@ -39,7 +39,7 @@ public class RobotContainer {
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.05) // Add a 5% deadband
-      .withDriveRequestType(DriveRequestType.OpenLoopVoltage); 
+      .withDriveRequestType(DriveRequestType.Velocity); 
 
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
@@ -49,9 +49,9 @@ public class RobotContainer {
   private void configureBindings() {
 
     drivetrain.setDefaultCommand(
-      drivetrain.applyRequest(() -> drive.withVelocityX(0) // Drive forward with negative Y (forward)
-            .withVelocityY(0) // Drive left with negative X (left)
-            .withRotationalRate(0))); // Drive counterclockwise with negative X (left)
+      drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+            .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+            .withRotationalRate(-joystick.getRightX() * MaxAngularRate))); // Drive counterclockwise with negative X (left)
 
     joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
     joystick.b().whileTrue(drivetrain.applyRequest(() -> point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))));
