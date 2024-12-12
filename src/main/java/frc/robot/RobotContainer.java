@@ -45,22 +45,15 @@ public class RobotContainer {
       .withDriveRequestType(DriveRequestType.Velocity); 
 
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-  private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
-  private void configureBindings() {
+  private void configureAxisActions() {
 
     drivetrain.setDefaultCommand(
       drivetrain.applyRequest(() -> drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
             .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
             .withRotationalRate(-joystick.getRightX() * MaxAngularRate))); // Drive counterclockwise with negative X (left)
-
-    joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
-    joystick.b().whileTrue(drivetrain.applyRequest(() -> point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))));
-
-    // Re-Gyro the robot
-    joystick.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
 
     if (Utils.isSimulation()) {
 
@@ -72,9 +65,20 @@ public class RobotContainer {
 
   }
 
+  private void configureBindings() {
+
+    joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
+
+    // Re-Gyro the robot
+    joystick.x().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
+
+  }
+
   public RobotContainer() {
 
     configureBindings();
+
+    configureAxisActions();
 
   }
 

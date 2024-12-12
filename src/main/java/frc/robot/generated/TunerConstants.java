@@ -45,7 +45,8 @@ public class TunerConstants {
 
     private static final Pigeon2Configuration pigeonConfigs = null;
 
-    // Value is in MPS ( meters per second)
+    // Value is in MPS ( meters per second) 
+    // Tune the robots drive speed in the RobotContainer class
     public static final double kSpeedAt12VoltsMps = 5.2;
 
     // Every 1 rotation of the azimuth ( motor ) results in kCoupleRatio drive motor turns
