@@ -48,7 +48,7 @@ public class TunerConstants {
     // Value is in MPS ( meters per second)
     public static final double kSpeedAt12VoltsMps = 5.2;
 
-    // Every 1 rotation of the azimuth results in kCoupleRatio drive motor turns
+    // Every 1 rotation of the azimuth ( motor ) results in kCoupleRatio drive motor turns
     private static final double kCoupleRatio = 3.5714285714285716;
 
     private static final double kDriveGearRatio = 6.122448979591837;

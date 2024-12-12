@@ -14,8 +14,11 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Swerve;
 
 public class RobotContainer {
-  private double MaxSpeed = TunerConstants.kSpeedAt12VoltsMps * 0.5;
-  private double MaxAngularRate = 1.5 * Math.PI; 
+
+  private double MaxSpeed = TunerConstants.kSpeedAt12VoltsMps * 0.7; // One tenth is about 0.5 metes per second, 0.9/90% is the
+                                                                     // absolute max, go no faster
+                                                                     
+  private double MaxAngularRate = 1.7 * Math.PI; // Controls how fast the robot quick turns
 
   public double getVoltage() {
 
