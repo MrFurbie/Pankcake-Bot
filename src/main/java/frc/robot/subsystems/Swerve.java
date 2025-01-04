@@ -1,6 +1,14 @@
 package frc.robot.subsystems;
 
+import java.util.List;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+import java.io.File;
+
+import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
@@ -8,19 +16,39 @@ import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import frc.robot.Constants;
+import frc.robot.generated.TunerConstants;
 
 public class Swerve extends SwerveDrivetrain implements Subsystem {
 
     private static final double kSimLoopPeriod = 0.005; // 5 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
+    private final PIDController turnController =
+    new PIDController(
+        Constants.SwerveConstants.turnControllerP,
+        Constants.SwerveConstants.turnControllerI,
+        Constants.SwerveConstants.turnControllerD);
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private final Rotation2d BlueAlliancePerspectiveRotation = Rotation2d.fromDegrees(0);
@@ -54,6 +82,50 @@ public class Swerve extends SwerveDrivetrain implements Subsystem {
         }
 
     }
+
+    public Command driveCommand(
+      DoubleSupplier translationX,
+      DoubleSupplier translationY,
+      DoubleSupplier angularRotationX,
+      BooleanSupplier doAim,
+      PhotonCamera camera) {
+    return run(
+        () -> {
+          PhotonPipelineResult result = camera.getLatestResult();
+          double yaw = 0.0;
+          if (result.hasTargets() && doAim.getAsBoolean()) {
+            List<PhotonTrackedTarget> targets = result.getTargets();
+            for (int i = 0; i < targets.size(); i++) {
+              if (targets.get(i).getFiducialId() == 7 || targets.get(i).getFiducialId() == 4) {
+                yaw = targets.get(i).getYaw();
+              }
+            }
+            drive(
+                swerve.swerveController.getRawTargetSpeeds(
+                    MathUtil.applyDeadband(
+                        translationX.getAsDouble() * swerve.getMaximumVelocity(),
+                        Constants.SwerveConstants.swerveDeadband),
+                    MathUtil.applyDeadband(
+                        translationY.getAsDouble() * swerve.getMaximumVelocity(),
+                        Constants.SwerveConstants.swerveDeadband),
+                    -turnController.calculate(yaw, 0)));
+          } else {
+            swerve.drive(
+                new Translation2d(
+                    MathUtil.applyDeadband(
+                        translationX.getAsDouble() * swerve.getMaximumVelocity(),
+                        Constants.SwerveConstants.swerveDeadband),
+                    MathUtil.applyDeadband(
+                        translationY.getAsDouble() * swerve.getMaximumVelocity(),
+                        Constants.SwerveConstants.swerveDeadband)),
+                MathUtil.applyDeadband(
+                    angularRotationX.getAsDouble() * swerve.getMaximumAngularVelocity(),
+                    Constants.SwerveConstants.swerveDeadband),
+                true,
+                false);
+          }
+        });
+  }
 
     public Command applyRequest(Supplier<SwerveRequest> requestSupplier) {
 

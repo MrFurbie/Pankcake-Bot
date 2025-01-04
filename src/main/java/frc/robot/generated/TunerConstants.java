@@ -150,6 +150,6 @@ public class TunerConstants {
             kBackRightSteerMotorId, kBackRightDriveMotorId, kBackRightEncoderId, kBackRightEncoderOffset, Units.inchesToMeters(kBackRightXPosInches), Units.inchesToMeters(kBackRightYPosInches), kInvertRightSide)
             .withSteerMotorInverted(kBackRightSteerInvert);
 
-    public static final Swerve DriveTrain = new Swerve(DrivetrainConstants, FrontLeft,FrontRight, BackLeft, BackRight);
+    public static final Swerve DriveTrain = new Swerve(DrivetrainConstants, FrontLeft, FrontRight, BackLeft, BackRight);
 
 }
