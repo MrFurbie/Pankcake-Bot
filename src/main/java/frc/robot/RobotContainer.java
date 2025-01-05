@@ -17,12 +17,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
-import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Swerve;
 
 public class RobotContainer {
 
-  private double MaxSpeed = TunerConstants.kSpeedAt12VoltsMps * 0.7; // One tenth is about 0.5 metes per second, 0.9/90% is the
+  private double MaxSpeed = DriveConstants.kSpeedAt12VoltsMps * 0.7; // One tenth is about 0.5 metes per second, 0.9/90% is the
                                                                      // absolute max, go no faster
                                                                      
   private double MaxAngularRate = 1.55 * Math.PI; // Controls how fast the robot quick turns
@@ -57,7 +56,7 @@ public class RobotContainer {
 
   private final CommandXboxController joystick = new CommandXboxController(0);
   
-  private final Swerve drivetrain = TunerConstants.DriveTrain; 
+  private final Swerve drivetrain = DriveConstants.DriveTrain; 
 
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
       .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.07) // Add a 7% deadband

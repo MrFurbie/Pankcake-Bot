@@ -13,6 +13,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
 
@@ -37,18 +38,45 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants;
-import frc.robot.generated.TunerConstants;
+import frc.robot.DriveConstants;
+import frc.robot.RobotContainer;
 
 public class Swerve extends SwerveDrivetrain implements Subsystem {
 
     private static final double kSimLoopPeriod = 0.005; // 5 ms
+
+    private final Swerve drivetrain = DriveConstants.DriveTrain;
+
     private Notifier m_simNotifier = null;
+
     private double m_lastSimTime;
+
+    private double MaxSpeed = DriveConstants.kSpeedAt12VoltsMps * 0.7;
+
+    private double MaxAngularRate = 1.55 * Math.PI;
+
     private final PIDController turnController =
     new PIDController(
         Constants.SwerveConstants.turnControllerP,
         Constants.SwerveConstants.turnControllerI,
         Constants.SwerveConstants.turnControllerD);
+
+    public double getMaximumVelocity() {
+
+        return DriveConstants.kSpeedAt12VoltsMps * 0.7;
+
+    }
+
+    public double getMaximumAngularVelocity() {
+
+        return 1.55 * Math.PI; 
+
+
+    }
+
+    public final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+    .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.07) // Add a 7% deadband
+    .withDriveRequestType(DriveRequestType.Velocity); 
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private final Rotation2d BlueAlliancePerspectiveRotation = Rotation2d.fromDegrees(0);
@@ -84,11 +112,15 @@ public class Swerve extends SwerveDrivetrain implements Subsystem {
     }
 
     public Command driveCommand(
+
       DoubleSupplier translationX,
       DoubleSupplier translationY,
       DoubleSupplier angularRotationX,
+
       BooleanSupplier doAim,
+
       PhotonCamera camera) {
+
     return run(
         () -> {
           PhotonPipelineResult result = camera.getLatestResult();
@@ -101,29 +133,36 @@ public class Swerve extends SwerveDrivetrain implements Subsystem {
               }
             }
             drive(
-                swerve.swerveController.getRawTargetSpeeds(
+                drivetrain.swerveController.getRawTargetSpeeds(
                     MathUtil.applyDeadband(
-                        translationX.getAsDouble() * swerve.getMaximumVelocity(),
+                        translationX.getAsDouble() * drivetrain.getMaximumVelocity(),
                         Constants.SwerveConstants.swerveDeadband),
                     MathUtil.applyDeadband(
-                        translationY.getAsDouble() * swerve.getMaximumVelocity(),
+                        translationY.getAsDouble() * drivetrain.getMaximumVelocity(),
                         Constants.SwerveConstants.swerveDeadband),
                     -turnController.calculate(yaw, 0)));
           } else {
-            swerve.drive(
-                new Translation2d(
-                    MathUtil.applyDeadband(
-                        translationX.getAsDouble() * swerve.getMaximumVelocity(),
-                        Constants.SwerveConstants.swerveDeadband),
-                    MathUtil.applyDeadband(
-                        translationY.getAsDouble() * swerve.getMaximumVelocity(),
-                        Constants.SwerveConstants.swerveDeadband)),
-                MathUtil.applyDeadband(
-                    angularRotationX.getAsDouble() * swerve.getMaximumAngularVelocity(),
-                    Constants.SwerveConstants.swerveDeadband),
-                true,
-                false);
+
+            // drivetrain.drive(
+            //     new Translation2d(
+            //         MathUtil.applyDeadband(
+            //             translationX.getAsDouble() * drivetrain.getMaximumVelocity(),
+            //             Constants.SwerveConstants.swerveDeadband),
+            //         MathUtil.applyDeadband(
+            //             translationY.getAsDouble() * drivetrain.getMaximumVelocity(),
+            //             Constants.SwerveConstants.swerveDeadband)),
+            //     MathUtil.applyDeadband(
+            //         angularRotationX.getAsDouble() * drivetrain.getMaximumAngularVelocity(),
+            //         Constants.SwerveConstants.swerveDeadband),
+            //     true,
+            //     false);
+
+            drivetrain.applyRequest(() -> drive.withVelocityX(translationY.getAsDouble() * MaxSpeed) // Drive forward with negative Y (forward)
+            .withVelocityY(translationX.getAsDouble() * MaxSpeed) // Drive left with negative X (left)
+            .withRotationalRate(angularRotationX.getAsDouble() * MaxAngularRate)); // Drive counterclockwise with negative X (left)
+
           }
+
         });
   }
 
@@ -153,6 +192,7 @@ public class Swerve extends SwerveDrivetrain implements Subsystem {
     }
 
     @Override
+    
     public void periodic() {
 
         /* Periodically try to apply the operator perspective */
