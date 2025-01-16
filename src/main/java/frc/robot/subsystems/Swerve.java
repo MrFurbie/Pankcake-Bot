@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import frc.robot.DriveConstants.TunerSwerveDrivetrain;
+import frc.robot.DriveConstants;
 
 public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
     private static final double kSimLoopPeriod = 0.005; // 5 ms
@@ -35,6 +36,8 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
     private static final Rotation2d kRedAlliancePerspectiveRotation = Rotation2d.k180deg;
     /* Keep track if we've ever applied the operator perspective before or not */
     private boolean m_hasAppliedOperatorPerspective = false;
+
+    public boolean shouldDriveSlow = false;
 
     /* Swerve requests to apply during SysId characterization */
     private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization = new SwerveRequest.SysIdSwerveTranslation();
@@ -209,6 +212,48 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
      */
     public Command sysIdDynamic(SysIdRoutine.Direction direction) {
         return m_sysIdRoutineToApply.dynamic(direction);
+    }
+
+    public void driveSlow() {
+
+        DriveConstants.MaxSpeed = 5.2 * 0.1;
+
+        DriveConstants.MaxAngularRate = 1.25 * 0.2;
+
+    }
+
+    public void driveNormal() {
+
+        DriveConstants.MaxSpeed = 5.2 * 0.5;
+
+        DriveConstants.MaxAngularRate = 1.25 * 0.55;
+
+    }
+
+    public void shouldDriveSlow() {
+
+        shouldDriveSlow = true;
+
+    }
+
+    public void shouldDriveFast() {
+
+        shouldDriveSlow = false;
+
+    }
+
+    public void checkDriveSlow() {
+
+        if (shouldDriveSlow == true) {
+
+            driveSlow();
+
+        } else {
+
+            driveNormal();
+
+        }
+    
     }
 
     @Override

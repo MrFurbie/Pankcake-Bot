@@ -53,7 +53,9 @@ public class DriveConstants {
 
     public static final CANBus kCANBus = new CANBus("Drivetrain", "./logs/example.hoot");
 
-    public static final double kSpeedAt12Volts = 5.2;
+    public static double MaxSpeed = 5.2;
+
+    public static double MaxAngularRate = 1.25;
 
     private static final double kCoupleRatio = 3.5714285714285716;
 
@@ -89,7 +91,7 @@ public class DriveConstants {
             .withSteerMotorClosedLoopOutput(kSteerClosedLoopOutput)
             .withDriveMotorClosedLoopOutput(kDriveClosedLoopOutput)
             .withSlipCurrent(kSlipCurrent)
-            .withSpeedAt12Volts(kSpeedAt12Volts)
+            .withSpeedAt12Volts(MaxSpeed)
             .withDriveMotorType(kDriveMotorType)
             .withSteerMotorType(kSteerMotorType)
             .withFeedbackSource(kSteerFeedbackType)
