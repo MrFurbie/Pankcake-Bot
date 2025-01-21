@@ -55,7 +55,7 @@ public class DriveConstants {
 
     public static double MaxSpeed = 5.2;
 
-    public static double MaxAngularRate = 1.25;
+    public static double MaxAngularRate = 2.6;
 
     private static final double kCoupleRatio = 3.5714285714285716;
 

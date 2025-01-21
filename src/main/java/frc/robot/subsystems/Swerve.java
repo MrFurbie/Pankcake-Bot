@@ -214,48 +214,6 @@ public class Swerve extends TunerSwerveDrivetrain implements Subsystem {
         return m_sysIdRoutineToApply.dynamic(direction);
     }
 
-    public void driveSlow() {
-
-        DriveConstants.MaxSpeed = 5.2 * 0.1;
-
-        DriveConstants.MaxAngularRate = 1.25 * 0.2;
-
-    }
-
-    public void driveNormal() {
-
-        DriveConstants.MaxSpeed = 5.2 * 0.5;
-
-        DriveConstants.MaxAngularRate = 1.25 * 0.55;
-
-    }
-
-    public void shouldDriveSlow() {
-
-        shouldDriveSlow = true;
-
-    }
-
-    public void shouldDriveFast() {
-
-        shouldDriveSlow = false;
-
-    }
-
-    public void checkDriveSlow() {
-
-        if (shouldDriveSlow == true) {
-
-            driveSlow();
-
-        } else {
-
-            driveNormal();
-
-        }
-    
-    }
-
     @Override
     public void periodic() {
         /*
